@@ -434,11 +434,11 @@ function splitName(fullName: string): { firstName: string; lastName: string } {
  */
 function mapStatus(appStatus: string): string {
     const statusMap: Record<string, string> = {
-        'scheduled': 'SCHEDULED',
-        'completed': 'COMPLETED',
-        'cancelled': 'CANCELLED',
+        'scheduled': 'scheduled',
+        'completed': 'completed',
+        'cancelled': 'cancelled',
     };
-    return statusMap[appStatus.toLowerCase()] || 'SCHEDULED';
+    return statusMap[appStatus.toLowerCase()] || 'scheduled';
 }
 
 /**
