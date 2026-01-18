@@ -43,7 +43,7 @@ export default function BookingForm() {
                 id: `temp-${Date.now()}`,
                 name: patientName,
                 email: patientEmail,
-                phone: null
+                phone: undefined
             };
 
             // Directly sync to Hospital-CRM (this creates patient and appointment there)
