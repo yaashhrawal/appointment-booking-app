@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth';
 import AppointmentList from '@/components/AppointmentList';
 import Notifications from '@/components/Notifications';
 import ApiKeyManager from '@/components/ApiKeyManager';
@@ -8,11 +10,41 @@ import ApiKeyManager from '@/components/ApiKeyManager';
 export default function DoctorDashboard() {
     const [refreshKey, setRefreshKey] = useState(0);
     const appointmentListRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
+    const { isAuthenticated, isLoading, logout } = useAuth();
+
+    // Redirect to login if not authenticated
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push('/doctor/login');
+        }
+    }, [isAuthenticated, isLoading, router]);
 
     const handleRefresh = () => {
-        // Force remount of AppointmentList to trigger fresh fetch
         setRefreshKey(prev => prev + 1);
     };
+
+    const handleLogout = () => {
+        logout();
+        router.push('/doctor/login');
+    };
+
+    // Show loading state while checking auth
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+                <div className="flex items-center gap-3">
+                    <div className="animate-spin h-6 w-6 border-2 border-indigo-600 border-t-transparent rounded-full"></div>
+                    <span className="text-slate-600">Loading...</span>
+                </div>
+            </div>
+        );
+    }
+
+    // Don't render dashboard if not authenticated
+    if (!isAuthenticated) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-slate-50 p-6 sm:p-10">
@@ -23,12 +55,20 @@ export default function DoctorDashboard() {
                         <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Doctor Dashboard</h1>
                         <p className="text-slate-500 mt-1">Manage appointments, patient notifications, and integrations</p>
                     </div>
-                    <button
-                        onClick={handleRefresh}
-                        className="w-full sm:w-auto bg-white border border-slate-200 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2"
-                    >
-                        <span className="text-lg">↻</span> Refresh All
-                    </button>
+                    <div className="flex gap-3 w-full sm:w-auto">
+                        <button
+                            onClick={handleRefresh}
+                            className="flex-1 sm:flex-none bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2"
+                        >
+                            <span className="text-lg">↻</span> Refresh
+                        </button>
+                        <button
+                            onClick={handleLogout}
+                            className="flex-1 sm:flex-none bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-100 hover:border-red-300 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2"
+                        >
+                            🚪 Logout
+                        </button>
+                    </div>
                 </div>
 
                 {/* Live Sync Banner */}

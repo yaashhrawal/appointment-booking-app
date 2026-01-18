@@ -30,7 +30,7 @@ export default function Home() {
         </Link>
 
         <Link
-          href="/doctor/dashboard"
+          href="/doctor/login"
           className="inline-flex justify-center items-center bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-full font-semibold text-lg hover:bg-slate-50 transition-all shadow-sm hover:shadow-md active:scale-95"
         >
           Doctor Portal
