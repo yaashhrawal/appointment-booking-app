@@ -29,14 +29,25 @@ export default function ApiKeyManager() {
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
+            if (error) {
+                // Table might not exist - this is okay, just log and continue
+                if (error.code === '42P01' || error.message?.includes('does not exist')) {
+                    console.warn('api_keys table does not exist yet - feature not initialized');
+                } else {
+                    console.warn('Error fetching keys:', error.message);
+                }
+                setKeys([]);
+                return;
+            }
             setKeys(data || []);
-        } catch (error) {
-            console.error('Error fetching keys:', error);
+        } catch (error: any) {
+            console.warn('API Keys fetch skipped:', error?.message || 'Unknown error');
+            setKeys([]);
         } finally {
             setLoading(false);
         }
     };
+
 
     const generateKey = async () => {
         if (!label.trim()) return alert('Please enter a label for this key (e.g., "City Hospital")');
