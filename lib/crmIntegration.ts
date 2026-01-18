@@ -1,5 +1,6 @@
 /**
  * CRM Integration Service
+ * @version 1.0.1
  *
  * This service handles synchronization between appointments-app and Hospital-CRM-Bhilwara.
  * Both applications share the same Supabase instance.
