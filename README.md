@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Appointment Booking
 
-## Getting Started
+A doctor appointment booking system with a patient-facing flow, a doctor dashboard, and an authenticated external API so other systems can push bookings in.
 
-First, run the development server:
+**Live:** https://appointments-app-lilac.vercel.app
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## What it does
+
+**Patients** book from a public page — pick a doctor, pick a slot, submit. No account needed.
+
+**Doctors** get an authenticated dashboard: incoming appointments, patient details, notification feed.
+
+**Other systems** can create appointments programmatically. `/api/external` is key-authenticated, so a clinic website or a CRM can book into the same calendar without a human in the loop. Keys are issued and revoked from the dashboard.
+
+---
+
+## Data model
+
+Five tables in PostgreSQL via Supabase:
+
+| Table | |
+|---|---|
+| `doctors` | Practitioner records and availability |
+| `patients` | Patient details, created on first booking |
+| `appointments` | Bookings linking doctor ↔ patient with slot and status |
+| `api_keys` | Issued keys for external integrations, revocable |
+| `notifications` | Delivery log for booking events |
+
+---
+
+## Structure
+
+```
+app/
+├── api/         auth · external (key-authenticated) · notify
+├── book/        public patient booking flow
+└── doctor/      login + dashboard (protected)
+lib/
+├── supabase.ts  client + queries
+├── auth.tsx     session handling
+├── crm.ts       CRM integration
+└── notifications.ts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Stack:** Next.js (App Router) · TypeScript · Supabase (PostgreSQL + Auth) · Tailwind · Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Running it
 
-## Learn More
+```bash
+npm install
+cp .env.example .env.local     # add Supabase URL + anon key
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Apply `supabase_schema.sql` to your Supabase project before first run.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built by [Yash Rawal](https://github.com/yaashhrawal).
